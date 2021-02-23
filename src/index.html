@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room</title>
+</head>
+
+<body>
+  <h1>Room</h1>
+
+  <div class="basicVideoCallContainer" x-data="basicVideoCall()" x-init="initBasicVideoCall()">
+    <div class="container-fluid banner">
+      <h2 class="banner-text" x-html="title"></h2>
+    </div>
+  
+    <div class="container">
+      <form>
+        <div class="row">
+          <div class="col-sm">
+            <p>Token(optional)</p>
+            <input type="text" placeholder="enter token" x-model="clientOptions.token">
+          </div>
+          <!-- <div class="col-sm">
+            <p>Channel</p>
+            <input type="text" placeholder="enter channel name" x-model="clientOptions.channel" required>
+          </div> -->
+        </div>
+  
+        <div class="button-group">
+          <button type="button" class="btn" @click="join()" x-bind:disabled="isDisabledJoin">Join</button>
+          <button type="button" class="btn" @click="leave()" x-show="isShowLeave">Leave</button>
+        </div>
+      </form>
+  
+      <div class="video-group">
+        <div class="col">
+          <p id="local-player-name" class="player-name"></p>
+          <div id="local-player" class="player"></div>
+        </div>
+        <div class="w-100"></div>
+        <div class="col">
+          <div id="remote-playerlist"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="share" x-show="isShowShare">
+      <button type="button" class="btn">
+        <span aria-hidden="true">Copy link to share</span>
+      </button>
+    </div>
+  </div>
+</body>
+
+</html>
