@@ -9,44 +9,40 @@
 </head>
 
 <body>
-  <h1>Room</h1>
-
-  <div class="basicVideoCallContainer" x-data="basicVideoCall()" x-init="initBasicVideoCall()">
+  <div class="container" x-data="room()" x-init="initRoom()">
     <div class="container-fluid banner">
       <h2 class="banner-text" x-html="title"></h2>
     </div>
-  
-    <div class="container">
-      <form>
-        <div class="row">
-          <div class="col-sm">
-            <p>Token(optional)</p>
-            <input type="text" placeholder="enter token" x-model="clientOptions.token">
-          </div>
-          <!-- <div class="col-sm">
-            <p>Channel</p>
-            <input type="text" placeholder="enter channel name" x-model="clientOptions.channel" required>
-          </div> -->
+
+    <form>
+      <div class="row">
+        <div class="col-sm">
+          <p class="required">Name</p>
+          <input type="text" placeholder="enter your name" x-model="clientOptions.username" required>
         </div>
-  
-        <div class="button-group">
-          <button type="button" class="btn" @click="join()" x-bind:disabled="isDisabledJoin">Join</button>
-          <button type="button" class="btn" @click="leave()" x-show="isShowLeave">Leave</button>
-        </div>
-      </form>
-  
-      <div class="video-group">
-        <div class="col">
-          <p id="local-player-name" class="player-name"></p>
-          <div id="local-player" class="player"></div>
-        </div>
-        <div class="w-100"></div>
-        <div class="col">
-          <div id="remote-playerlist"></div>
+        <div class="col-sm">
+          <p class="required">Password</p>
+          <input type="password" placeholder="enter password" x-model="clientOptions.password" required>
         </div>
       </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn" @click="join()" x-bind:disabled="isDisabledJoin">Join</button>
+        <button type="button" class="btn" @click="leave()" x-show="isShowLeave">Leave</button>
+      </div>
+    </form>
+
+    <div class="video-group">
+      <div class="col">
+        <p id="local-player-name" class="player-name"></p>
+        <div id="local-player" class="player"></div>
+      </div>
+      <div class="w-100"></div>
+      <div class="col">
+        <div id="remote-playerlist"></div>
+      </div>
     </div>
-  
+
     <div class="share" x-show="isShowShare">
       <button type="button" class="btn">
         <span aria-hidden="true">Copy link to share</span>

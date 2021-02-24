@@ -3,29 +3,43 @@ import 'alpinejs';
 import AgoraRTC, { IAgoraRTCClient } from "agora-rtc-sdk-ng";
 import { settings } from './app-settings';
 
-// create Agora client
-const basicVideoCallClient: IAgoraRTCClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+function room() {
 
-function basicVideoCall() {
+    // 创建 Agora 本地客户端
+    const client: IAgoraRTCClient = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+
+    const rtc = {
+        // 本地客户端
+        client,
+        // 本地音视频频轨道对象
+        localAudioTrack: null,
+        localVideoTrack: null,
+    };
+
+    async function joinChannel(options: any) {
+        const uid = await rtc.client.join(options.appId, options.channel, options.token, null);
+    }
+
     return {
-        title: 'Video Call',
+        title: 'Room',
         clientOptions: {
-            channel: '',
-            uid: '',
-            token: ''
+            channel: 'room', // 频道名
+            token: '',
+            password: '',
+            username: '',
         },
         isDisabledJoin: false,
         isShowShare: false,
         isShowLeave: false,
-        initBasicVideoCall() {
+        initRoom() {
             // the demo can auto join channel with params in url
             const urlParams = new URL(location.href).searchParams;
             this.clientOptions.channel = urlParams.get("channel") as string; // 频道
             this.clientOptions.token = urlParams.get("token") as string;
         },
         async join() {
-            this.isDisabledJoin = true;
-            if (settings.app_id) {
+            if (settings.app_id && this.clientOptions.password && this.clientOptions.username) {
+                this.isDisabledJoin = true;
                 // TODO
             }
         },
@@ -35,9 +49,5 @@ function basicVideoCall() {
     }
 }
 
-// 将 basicVideoCall 定义在 window 对象中，供 alpinejs 使用
-(window as any).basicVideoCall = basicVideoCall;
-
-async function joinChannel() {
-    // TODO
-}
+// 将 room 定义在 window 对象中，供 alpinejs 使用
+(window as any).room = room;
