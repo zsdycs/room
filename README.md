@@ -31,3 +31,5 @@ ROOM——房间，这是一个基于 [Agora.io](https://www.agora.io/cn) 提供
 > 1. `npm cache clean -force`
 > 2. `npm install -g mirror-config-china`
 > 3. `npm install node-sass`
+
+获取 [SHA256 加密字符串](https://tool.oschina.net/encrypt?type=2)
