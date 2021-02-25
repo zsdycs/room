@@ -14,31 +14,31 @@
       <h2 class="banner-text" x-html="title"></h2>
     </div>
 
-    <form>
-      <div class="row">
-        <div class="col-sm">
+    <div class="form">
+      <div>
+        <div>
           <p class="required">Name</p>
-          <input type="text" placeholder="enter your name" x-model="clientOptions.username" required>
+          <input type="text" autocomplete="username" placeholder="enter your name" x-model="clientOptions.username" required maxlength="10">
         </div>
-        <div class="col-sm">
+        <div>
           <p class="required">Password</p>
-          <input type="password" placeholder="enter password" x-model="clientOptions.password" required>
+          <input type="password" autocomplete="current-password" placeholder="enter password" x-model="clientOptions.password" required maxlength="20">
         </div>
       </div>
 
       <div class="button-group">
-        <button type="submit" class="btn" @click="join()" x-bind:disabled="isDisabledJoin">Join</button>
+        <button type="button" class="btn" @click="join()" x-bind:disabled="isDisabledJoin">Join</button>
         <button type="button" class="btn" @click="leave()" x-show="isShowLeave">Leave</button>
       </div>
-    </form>
+    </div>
 
     <div class="video-group">
-      <div class="col">
+      <div>
         <p id="local-player-name" class="player-name"></p>
         <div id="local-player" class="player"></div>
       </div>
       <div class="w-100"></div>
-      <div class="col">
+      <div>
         <div id="remote-playerlist"></div>
       </div>
     </div>
