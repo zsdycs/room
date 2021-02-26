@@ -27,6 +27,6 @@
     "@types/crypto-js": "^4.0.1",
     "agora-rtc-sdk-ng": "^4.3.0",
     "alpinejs": "^2.8.0",
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^3.1.9-1"
   }
 }
