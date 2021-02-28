@@ -34,11 +34,11 @@ module.exports = {
   },
   devtool: process.env.NODE_ENV === "production" ? false : "inline-source-map",
   devServer: {
-    contentBase: "./dist",
+    contentBase: "../dist",
     stats: "errors-only",
     compress: false,
-    host: "localhost",
-    port: 8080
+    host: "0.0.0.0",
+    port: 80
   },
   plugins: [
     new HtmlWebpackPlugin({
