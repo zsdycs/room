@@ -16,7 +16,6 @@ function room() {
     interface Client {
         channel: string,
         password: string | null,
-        username: string | null,
     }
 
     interface ModalMsg {
@@ -32,7 +31,6 @@ function room() {
     const clientOptions: Client = {
         channel: 'room', // 频道名
         password: '',
-        username: '',
     };
 
     const rtc: RTC = {
@@ -47,6 +45,8 @@ function room() {
         hasAudioDevice: false,
         hasVideoDevice: false,
     }
+
+    const $ = document.querySelector.bind(document);
 
     // ************************************************** handle **************************************************
     // SHA256 加密
@@ -74,11 +74,7 @@ function room() {
         let msgTitle: string = '';
         if (modalType === 'formMsg') {
             msgTitle = '表单验证';
-            const { username, password } = msgObj as Client;
-            if (!username) {
-                const usernameMsg = '• 请输入你在房间中的用户名\n';
-                msgContent = msgContent ? msgContent + usernameMsg : usernameMsg;
-            }
+            const { password } = msgObj as Client;
             if (!password) {
                 const passwordMsg = '• 请输入房间密码\n';
                 msgContent = msgContent ? msgContent + passwordMsg : passwordMsg;
@@ -122,9 +118,8 @@ function room() {
                 const remoteVideoTrack = user.videoTrack;
                 const playerContainer = document.createElement('div');
                 playerContainer.id = user.uid.toString();
-                playerContainer.style.width = '640px';
-                playerContainer.style.height = '480px';
-                document.body.append(playerContainer);
+                playerContainer.classList.add('remote-player');
+                $('#remote-playerList')?.append(playerContainer);
 
                 remoteVideoTrack?.play(playerContainer);
             }
@@ -143,53 +138,39 @@ function room() {
         clientOptions, // client 参数
         rtc,
         isShowJoin: true, // Join 按钮
-        isShowShare: false, // Share 按钮
+        isPlaying: false, // 是否在视频通话
         isDisabledPassword: false, // Password 文本框
-        isShowLeave: false, // Leave 按钮
         isShowModal: false, // Modal 消息确认
         modalMsgTitle: '', // 消息标题
         modalMsgContent: '', // 消息内容
         isShowCheckDevices: true, // Check Devices 按钮
         localDevices, // 本地设备
+        containerClass: 'container', // container Class
         initRoom() {
-            this.clientOptions.username = localStorage.getItem('ROOM/USR');
             this.clientOptions.password = sessionStorage.getItem('ROOM/PWD');
             this.isDisabledPassword = sessionStorage.getItem('ROOM/PWD') ? true : false;
             userPublished();
         },
         async join() {
-            if (this.clientOptions.password && this.clientOptions.username) {
-                localStorage.setItem('ROOM/USR', this.clientOptions.username);
+            if (this.clientOptions.password) {
                 const pwd = pwdStorage(this.clientOptions.password);
                 if (settings.pwd === pwd) {
                     this.isShowJoin = false;
                     this.isDisabledPassword = true;
-                    this.checkDevices();
-                    if (!this.localDevices.hasAudioDevice && !this.localDevices.hasVideoDevice) {
-                        return;
-                    }
                     // 加入目标频道
                     this.rtc.client.join(settings.appId, this.clientOptions.channel, null, null)
                         .then(async (uid) => {
-                            // tslint:disable-next-line: no-console
-                            console.log(`Successfully joined! UID: ${uid}`);
-                            this.isShowLeave = true;
                             this.isShowCheckDevices = false;
-
                             // 将音视频轨道对象发布到频道中
-                            if (this.localDevices.hasAudioDevice) {
-                                this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                                this.rtc.client.publish(this.rtc.localAudioTrack);
-                            }
-                            if (this.localDevices.hasVideoDevice) {
-                                this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
-                                this.rtc.client.publish(this.rtc.localVideoTrack);
-                            }
-                            this.isShowShare = true;
+                            this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                            this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+                            this.rtc.client.publish(this.rtc.localAudioTrack);
+                            this.rtc.client.publish(this.rtc.localVideoTrack);
+                            this.rtc.localVideoTrack.play('local-player');
+                            this.containerClass = 'container isPlaying';
+                            this.isPlaying = true;
                         })
                         .catch((err) => {
-                            // tslint:disable-next-line: no-console
-                            console.log(`Error joining channel!\n${err}`);
                             const { msgTitle, msgContent } = setMsg('rtcMsg', { err });
                             this.modalMsgTitle = msgTitle;
                             this.modalMsgContent = msgContent;
@@ -209,6 +190,8 @@ function room() {
                 this.modalMsgTitle = msgTitle;
                 this.modalMsgContent = msgContent;
                 this.isShowModal = true;
+                this.isShowJoin = true;
+                this.isShowCheckDevices = true;
             }
         },
         async leave() {
@@ -221,9 +204,10 @@ function room() {
             }
             // 离开频道
             await this.rtc.client.leave();
-            this.isShowLeave = false;
             this.isShowJoin = true;
             this.isShowCheckDevices = true;
+            this.containerClass = 'container';
+            this.isPlaying = false;
         },
         ok() {
             this.isShowModal = false;
@@ -234,7 +218,6 @@ function room() {
             this.isDisabledPassword = false;
         },
         cleanName() {
-            this.clientOptions.username = '';
             localStorage.removeItem('ROOM/USR');
         },
         checkDevices() {
@@ -270,7 +253,13 @@ function room() {
                         this.modalMsgContent = msgContent;
                         this.isShowModal = true;
                     }
-                });
+                })
+                .catch((err) => {
+                    const { msgTitle, msgContent } = setMsg('rtcMsg', { err });
+                    this.modalMsgTitle = msgTitle;
+                    this.modalMsgContent = msgContent;
+                    this.isShowModal = true;
+                });;
         },
         copyLink() {
             const textArea = document.createElement('textarea');
