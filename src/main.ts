@@ -46,8 +46,6 @@ function room() {
         hasVideoDevice: false,
     }
 
-    const $ = document.querySelector.bind(document);
-
     // ************************************************** handle **************************************************
     // SHA256 加密
     function cryptographicEncryption(password: string | null) {
@@ -116,11 +114,8 @@ function room() {
             // 视频
             if (mediaType === 'video') {
                 const remoteVideoTrack = user.videoTrack;
-                const playerContainer = document.createElement('div');
-                playerContainer.id = user.uid.toString();
-                playerContainer.classList.add('remote-player');
-                $('#remote-playerList')?.append(playerContainer);
-
+                const playerContainer = `<div id="${user.uid.toString()}" class="remote-player"></div>`;
+                document.querySelector('#remote-playerList')?.insertAdjacentHTML('beforeend', playerContainer);
                 remoteVideoTrack?.play(playerContainer);
             }
 
@@ -138,14 +133,13 @@ function room() {
         clientOptions, // client 参数
         rtc,
         isShowJoin: true, // Join 按钮
-        isPlaying: false, // 是否在视频通话
+        isPlaying: true, // 是否在视频通话
         isDisabledPassword: false, // Password 文本框
         isShowModal: false, // Modal 消息确认
         modalMsgTitle: '', // 消息标题
         modalMsgContent: '', // 消息内容
         isShowCheckDevices: true, // Check Devices 按钮
         localDevices, // 本地设备
-        containerClass: 'container', // container Class
         initRoom() {
             this.clientOptions.password = sessionStorage.getItem('ROOM/PWD');
             this.isDisabledPassword = sessionStorage.getItem('ROOM/PWD') ? true : false;
@@ -167,7 +161,6 @@ function room() {
                             this.rtc.client.publish(this.rtc.localAudioTrack);
                             this.rtc.client.publish(this.rtc.localVideoTrack);
                             this.rtc.localVideoTrack.play('local-player');
-                            this.containerClass = 'container isPlaying';
                             this.isPlaying = true;
                         })
                         .catch((err) => {
@@ -206,7 +199,6 @@ function room() {
             await this.rtc.client.leave();
             this.isShowJoin = true;
             this.isShowCheckDevices = true;
-            this.containerClass = 'container';
             this.isPlaying = false;
         },
         ok() {

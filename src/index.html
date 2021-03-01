@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <link rel="shortcut icon" href="assets/img/favicon.png">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Room</title>
@@ -10,7 +11,7 @@
 
 <body>
   <div class="main" x-data="room()" x-init="initRoom()">
-    <div x-bind:class="containerClass">
+    <div x-bind:class="isPlaying? 'container isPlaying' : 'container'">
       <div class="container-fluid banner">
         <h2 class="banner-text" x-html="title"></h2>
       </div>
@@ -22,8 +23,10 @@
             <div class="input-row">
               <input type="password" autocomplete="current-password" placeholder="输入密码" x-model="clientOptions.password"
                 x-bind:disabled="isDisabledPassword" required maxlength="20">
-              <button type="button" class="btn-clean" @click="cleanPassword()" x-show="clientOptions.password" title="清除">
-                <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+              <button type="button" class="btn-clean" @click="cleanPassword()" x-show="clientOptions.password"
+                title="清除">
+                <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
+                  xmlns="http://www.w3.org/2000/svg">
                   <path id="fa-times"
                     d="M1490 1322q0 40-28 68l-136 136q-28 28-68 28t-68-28l-294-294-294 294q-28 28-68 28t-68-28l-136-136q-28-28-28-68t28-68l294-294-294-294q-28-28-28-68t28-68l136-136q28-28 68-28t68 28l294 294 294-294q28-28 68-28t68 28l136 136q28 28 28 68t-28 68l-294 294 294 294q28 28 28 68z" />
                 </svg>
@@ -31,16 +34,19 @@
             </div>
           </div>
         </div>
-  
+
         <div class="button-group">
           <button type="button" class="btn" @click="join()" x-show="isShowJoin" title="加入">加入</button>
-          <button type="button" class="btn" @click="checkDevices()" x-show="isShowCheckDevices" title="检测设备">检测设备</button>
+          <button type="button" class="btn" @click="checkDevices()" x-show="isShowCheckDevices"
+            title="检测设备">检测设备</button>
         </div>
       </div>
-  
+
       <div class="video-group" x-show="isPlaying">
-        <div>
-          <div id="local-player"></div>
+        <div class="player-container">
+          <div id="local-player">
+            <div class="local-player-name">本地源</div>
+          </div>
         </div>
         <div class="w-100"></div>
         <div>
@@ -54,13 +60,14 @@
           <button type="button" class="btn" @click="copyLink()" title="复制链接以分享房间">复制链接以分享房间</button>
         </div>
       </div>
-  
+
       <div class="modal" x-show="isShowModal">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <h4 class="modal-title">
-                <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
+                  xmlns="http://www.w3.org/2000/svg">
                   <path id="fa-info-circle"
                     d="M1152 1376v-160q0-14-9-23t-23-9h-96v-512q0-14-9-23t-23-9h-320q-14 0-23 9t-9 23v160q0 14 9 23t23 9h96v320h-96q-14 0-23 9t-9 23v160q0 14 9 23t23 9h448q14 0 23-9t9-23zm-128-896v-160q0-14-9-23t-23-9h-192q-14 0-23 9t-9 23v160q0 14 9 23t23 9h192q14 0 23-9t9-23zm640 416q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z" />
                 </svg>
