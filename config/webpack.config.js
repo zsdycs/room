@@ -37,7 +37,7 @@ module.exports = {
     contentBase: "../dist",
     stats: "errors-only",
     compress: false,
-    host: "0.0.0.0",
+    host: "localhost",
     port: 80
   },
   plugins: [
