@@ -5,8 +5,8 @@ const path = require("path");
 module.exports = {
   entry: "./src/main.ts",
   output: {
-    path: path.resolve(__dirname, '../dist'),
-    filename: "build.js"
+    path: path.resolve(__dirname, './dist'),
+    filename: "[name].[hash].bundle.js"
   },
   resolve: {
     extensions: [".tsx", ".ts", ".js"]
@@ -34,15 +34,17 @@ module.exports = {
   },
   devtool: process.env.NODE_ENV === "production" ? false : "inline-source-map",
   devServer: {
-    contentBase: "../dist",
+    contentBase: path.resolve(__dirname, './dist'),
     stats: "errors-only",
-    compress: false,
+    compress: true,
+    hot: true,
     host: "localhost",
     port: 80
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./src/index.html"
+      template: "./src/index.html",
+      favicon: path.resolve('favicon.png')
     }),
     new webpack.ProvidePlugin({
       process: 'process/browser',
