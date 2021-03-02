@@ -116,7 +116,7 @@ function room() {
                 const remoteVideoTrack = user.videoTrack;
                 const playerContainer = `<div id="${user.uid.toString()}" class="remote-player"></div>`;
                 document.querySelector('#remote-playerList')?.insertAdjacentHTML('beforeend', playerContainer);
-                remoteVideoTrack?.play(playerContainer);
+                remoteVideoTrack?.play(user.uid.toString());
             }
 
             // 音频
@@ -133,7 +133,7 @@ function room() {
         clientOptions, // client 参数
         rtc,
         isShowJoin: true, // Join 按钮
-        isPlaying: true, // 是否在视频通话
+        isPlaying: false, // 是否在视频通话
         isDisabledPassword: false, // Password 文本框
         isShowModal: false, // Modal 消息确认
         modalMsgTitle: '', // 消息标题
@@ -149,18 +149,18 @@ function room() {
             if (this.clientOptions.password) {
                 const pwd = pwdStorage(this.clientOptions.password);
                 if (settings.pwd === pwd) {
-                    this.isShowJoin = false;
                     this.isDisabledPassword = true;
                     // 加入目标频道
                     this.rtc.client.join(settings.appId, this.clientOptions.channel, null, null)
                         .then(async (uid) => {
-                            this.isShowCheckDevices = false;
                             // 将音视频轨道对象发布到频道中
                             this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
                             this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
                             this.rtc.client.publish(this.rtc.localAudioTrack);
                             this.rtc.client.publish(this.rtc.localVideoTrack);
                             this.rtc.localVideoTrack.play('local-player');
+                            this.isShowCheckDevices = false;
+                            this.isShowJoin = false;
                             this.isPlaying = true;
                         })
                         .catch((err) => {
