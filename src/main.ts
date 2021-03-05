@@ -114,9 +114,9 @@ function room() {
             // 视频
             if (mediaType === 'video') {
                 const remoteVideoTrack = user.videoTrack;
-                const playerContainer = `<div id="${user.uid.toString()}" class="remote-player"></div>`;
+                const playerContainer = `<div id="userID_${user.uid.toString()}" class="remote-player"></div>`;
                 document.querySelector('#remote-playerList')?.insertAdjacentHTML('beforeend', playerContainer);
-                remoteVideoTrack?.play(user.uid.toString());
+                remoteVideoTrack?.play(`userID_${user.uid.toString()}`);
             }
 
             // 音频
@@ -125,6 +125,12 @@ function room() {
                 const remoteAudioTrack = user.audioTrack;
                 remoteAudioTrack?.play();
             }
+        });
+    }
+    // 订阅远端处理
+    function userUnPublished() {
+        rtc.client.on('user-unpublished', async (user) => {
+            document.querySelector(`#userID_${user.uid}`)?.remove();
         });
     }
     // ************************************************** return **************************************************
@@ -144,6 +150,7 @@ function room() {
             this.clientOptions.password = sessionStorage.getItem('ROOM/PWD');
             this.isDisabledPassword = sessionStorage.getItem('ROOM/PWD') ? true : false;
             userPublished();
+            userUnPublished();
         },
         async join() {
             if (this.clientOptions.password) {
