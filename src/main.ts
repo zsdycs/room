@@ -134,10 +134,6 @@ function room() {
             document.querySelector(`#userID_${user.uid}`)?.remove();
         });
     }
-    async function createMedia() {
-        rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-        rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
-    }
     // ************************************************** return **************************************************
     return {
         title, // 标题
@@ -145,6 +141,8 @@ function room() {
         rtc,
         isShowJoin: true, // Join 按钮
         isPlaying: false, // 是否在视频通话
+        isLocalPlaying: false, // 是否打开了摄像头
+        isMicrophoneUsing: false, // 是否打开了麦克风
         isDisabledPassword: false, // Password 文本框
         isShowModal: false, // Modal 消息确认
         modalMsgTitle: '', // 消息标题
@@ -165,11 +163,14 @@ function room() {
                     // 加入目标频道
                     this.rtc.client.join(settings.appId, this.clientOptions.channel, null, null)
                         .then(async (uid) => {
-                            await createMedia();
+                            this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                            this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
                             // 将音视频轨道对象发布到频道中
                             this.rtc.client.publish(this.rtc.localAudioTrack);
+                            this.isMicrophoneUsing = true;
                             this.rtc.client.publish(this.rtc.localVideoTrack);
                             this.rtc.localVideoTrack.play('local-player');
+                            this.isLocalPlaying = true;
                             this.isShowCheckDevices = false;
                             this.isShowJoin = false;
                             this.isPlaying = true;
@@ -204,15 +205,48 @@ function room() {
                 this.rtc.localAudioTrack.close();
             }
             if (this.rtc.localVideoTrack) {
+                this.rtc.localVideoTrack.stop();
                 this.rtc.localVideoTrack.close();
             }
             // 离开频道
             await this.rtc.client.leave();
             // 移除用于视频播放的盒子
-            document.querySelector(`#remote-playerList`)?.removeChild((document.querySelector('.remote-player') as Element));
+            if (document.querySelector('.remote-player')) {
+                document.querySelector(`#remote-playerList`)?.removeChild((document.querySelector('.remote-player') as Element));
+            }
             this.isShowJoin = true;
             this.isShowCheckDevices = true;
             this.isPlaying = false;
+        },
+        async localVideoSwitch() {
+            try {
+                if (this.isLocalPlaying) {
+                    this.rtc.localVideoTrack.close();
+                    await this.rtc.client.unpublish(this.rtc.localVideoTrack);
+                    this.isLocalPlaying = false;
+                } else {
+                    this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+                    this.rtc.client.publish(this.rtc.localVideoTrack);
+                    this.rtc.localVideoTrack.play('local-player');
+                    this.isLocalPlaying = true;
+                }
+            } catch (err) {
+                const { msgTitle, msgContent } = setMsg('rtcMsg', { err });
+                this.modalMsgTitle = msgTitle;
+                this.modalMsgContent = msgContent;
+                this.isShowModal = true;
+            }
+        },
+        async localAudioSwitch() {
+            if (this.isMicrophoneUsing) {
+                this.rtc.localAudioTrack.close();
+                await this.rtc.client.unpublish(this.rtc.localAudioTrack);
+                this.isMicrophoneUsing = false;
+            } else {
+                this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                this.rtc.client.publish(this.rtc.localAudioTrack);
+                this.isMicrophoneUsing = true;
+            }
         },
         ok() {
             this.isShowModal = false;
@@ -268,7 +302,7 @@ function room() {
         },
         copyLink() {
             const textArea = document.createElement('textarea');
-            textArea.value = `我正在使用 Room，点击链接：\n${location.href}\n加入房间吧!`;
+            textArea.value = `${location.href}`;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');

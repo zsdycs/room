@@ -42,6 +42,47 @@
       </div>
 
       <div class="video-group" x-show="isPlaying">
+        <div class="video-btn">
+          <div class="btn-group">
+            <button x-show="rtc.localVideoTrack" type="button" class="btn-item" @click="localVideoSwitch()"
+              title="摄像头开关">
+              <svg x-show="rtc.localVideoTrack && rtc.localVideoTrack.isPlaying" class="fa-svg" width="1792"
+                height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                <path id="fa-eye"
+                  d="M1664 960q-152-236-381-353 61 104 61 225 0 185-131.5 316.5t-316.5 131.5-316.5-131.5-131.5-316.5q0-121 61-225-229 117-381 353 133 205 333.5 326.5t434.5 121.5 434.5-121.5 333.5-326.5zm-720-384q0-20-14-34t-34-14q-125 0-214.5 89.5t-89.5 214.5q0 20 14 34t34 14 34-14 14-34q0-86 61-147t147-61q20 0 34-14t14-34zm848 384q0 34-20 69-140 230-376.5 368.5t-499.5 138.5-499.5-139-376.5-368q-20-35-20-69t20-69q140-229 376.5-368t499.5-139 499.5 139 376.5 368q20 35 20 69z" />
+              </svg>
+              <svg x-show="rtc.localVideoTrack && !rtc.localVideoTrack.isPlaying" class="fa-svg" width="1792"
+                height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                <path id="fa-eye-slash"
+                  d="M555 1335l78-141q-87-63-136-159t-49-203q0-121 61-225-229 117-381 353 167 258 427 375zm389-759q0-20-14-34t-34-14q-125 0-214.5 89.5t-89.5 214.5q0 20 14 34t34 14 34-14 14-34q0-86 61-147t147-61q20 0 34-14t14-34zm363-191q0 7-1 9-106 189-316 567t-315 566l-49 89q-10 16-28 16-12 0-134-70-16-10-16-28 0-12 44-87-143-65-263.5-173t-208.5-245q-20-31-20-69t20-69q153-235 380-371t496-136q89 0 180 17l54-97q10-16 28-16 5 0 18 6t31 15.5 33 18.5 31.5 18.5 19.5 11.5q16 10 16 27zm37 447q0 139-79 253.5t-209 164.5l280-502q8 45 8 84zm448 128q0 35-20 69-39 64-109 145-150 172-347.5 267t-419.5 95l74-132q212-18 392.5-137t301.5-307q-115-179-282-294l63-112q95 64 182.5 153t144.5 184q20 34 20 69z" />
+              </svg>
+            </button>
+            <button x-show="rtc.localAudioTrack" type="button" class="btn-item" @click="localAudioSwitch()" title="麦克风开关">
+              <svg x-show="isMicrophoneUsing" class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                <path id="fa-microphone"
+                  d="M1472 704v128q0 221-147.5 384.5t-364.5 187.5v132h256q26 0 45 19t19 45-19 45-45 19h-640q-26 0-45-19t-19-45 19-45 45-19h256v-132q-217-24-364.5-187.5t-147.5-384.5v-128q0-26 19-45t45-19 45 19 19 45v128q0 185 131.5 316.5t316.5 131.5 316.5-131.5 131.5-316.5v-128q0-26 19-45t45-19 45 19 19 45zm-256-384v512q0 132-94 226t-226 94-226-94-94-226v-512q0-132 94-226t226-94 226 94 94 226z" />
+              </svg>
+              <svg x-show="!isMicrophoneUsing"  class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                <path id="fa-microphone-slash" d="M463 945l-101 101q-42-103-42-214v-128q0-26 19-45t45-19 45 19 19 45v128q0 53 15 113zm1114-602l-361 361v128q0 132-94 226t-226 94q-55 0-109-19l-96 96q97 51 205 51 185 0 316.5-131.5t131.5-316.5v-128q0-26 19-45t45-19 45 19 19 45v128q0 221-147.5 384.5t-364.5 187.5v132h256q26 0 45 19t19 45-19 45-45 19h-640q-26 0-45-19t-19-45 19-45 45-19h256v-132q-125-13-235-81l-254 254q-10 10-23 10t-23-10l-82-82q-10-10-10-23t10-23l1234-1234q10-10 23-10t23 10l82 82q10 10 10 23t-10 23zm-380-132l-621 621v-512q0-132 94-226t226-94q102 0 184.5 59t116.5 152z"/>
+              </svg>
+            </button>
+            <button type="button" class="btn-item" @click="leave()" title="离开">
+              <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
+              xmlns="http://www.w3.org/2000/svg">
+              <path id="fa-sign-out" d="M704 1440q0 4 1 20t.5 26.5-3 23.5-10 19.5-20.5 6.5h-320q-119 0-203.5-84.5t-84.5-203.5v-704q0-119 84.5-203.5t203.5-84.5h320q13 0 22.5 9.5t9.5 22.5q0 4 1 20t.5 26.5-3 23.5-10 19.5-20.5 6.5h-320q-66 0-113 47t-47 113v704q0 66 47 113t113 47h312l11.5 1 11.5 3 8 5.5 7 9 2 13.5zm928-544q0 26-19 45l-544 544q-19 19-45 19t-45-19-19-45v-288h-448q-26 0-45-19t-19-45v-384q0-26 19-45t45-19h448v-288q0-26 19-45t45-19 45 19l544 544q19 19 19 45z"/>
+            </svg>
+            </button>
+            <div class="button-group">
+              <button type="button" class="btn-item" @click="copyLink()" title="复制链接以分享房间">
+                <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path id="fa-share"
+                    d="M1792 640q0 26-19 45l-512 512q-19 19-45 19t-45-19-19-45v-256h-224q-98 0-175.5 6t-154 21.5-133 42.5-105.5 69.5-80 101-48.5 138.5-17.5 181q0 55 5 123 0 6 2.5 23.5t2.5 26.5q0 15-8.5 25t-23.5 10q-16 0-28-17-7-9-13-22t-13.5-30-10.5-24q-127-285-127-451 0-199 53-333 162-403 875-403h224v-256q0-26 19-45t45-19 45 19l512 512q19 19 19 45z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="player-container">
           <div id="local-player">
             <div class="local-player-name">本地源</div>
@@ -55,10 +96,6 @@
       </div>
 
       <div class="setting" x-show="isPlaying">
-        <div class="button-group">
-          <button type="button" class="btn" @click="leave()" title="离开">离开</button>
-          <button type="button" class="btn" @click="copyLink()" title="复制链接以分享房间">复制链接以分享房间</button>
-        </div>
       </div>
 
       <div class="modal" x-show="isShowModal">
