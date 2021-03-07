@@ -143,6 +143,7 @@ function room() {
         isPlaying: false, // 是否在视频通话
         isLocalPlaying: false, // 是否打开了摄像头
         isMicrophoneUsing: false, // 是否打开了麦克风
+        fullscreen: false, // 是否全屏
         isDisabledPassword: false, // Password 文本框
         isShowModal: false, // Modal 消息确认
         modalMsgTitle: '', // 消息标题
@@ -253,6 +254,15 @@ function room() {
                 this.modalMsgTitle = msgTitle;
                 this.modalMsgContent = msgContent;
                 this.isShowModal = true;
+            }
+        },
+        fullScreen() {
+            if (!this.fullscreen) {
+                document.querySelector(`.video-group`)?.requestFullscreen();
+                this.fullscreen = true;
+            } else {
+                document.exitFullscreen();
+                this.fullscreen = false;
             }
         },
         ok() {
