@@ -9,8 +9,8 @@ function room() {
     // ************************************************** 接口 **************************************************
     interface RTC {
         client: IAgoraRTCClient,
-        localAudioTrack: IMicrophoneAudioTrack | null,
-        localVideoTrack: ICameraVideoTrack | null,
+        localAudioTrack: IMicrophoneAudioTrack,
+        localVideoTrack: ICameraVideoTrack,
     }
 
     interface Client {
@@ -36,8 +36,9 @@ function room() {
     const rtc: RTC = {
         // 本地客户端
         client: AgoraRTC.createClient({ mode: "rtc", codec: "vp8" }),
-        // 本地音视频频轨道对象
+        // @ts-ignore
         localAudioTrack: null,
+        // @ts-ignore
         localVideoTrack: null,
     };
 
@@ -133,6 +134,10 @@ function room() {
             document.querySelector(`#userID_${user.uid}`)?.remove();
         });
     }
+    async function createMedia() {
+        rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+        rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+    }
     // ************************************************** return **************************************************
     return {
         title, // 标题
@@ -160,9 +165,8 @@ function room() {
                     // 加入目标频道
                     this.rtc.client.join(settings.appId, this.clientOptions.channel, null, null)
                         .then(async (uid) => {
+                            await createMedia();
                             // 将音视频轨道对象发布到频道中
-                            this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                            this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
                             this.rtc.client.publish(this.rtc.localAudioTrack);
                             this.rtc.client.publish(this.rtc.localVideoTrack);
                             this.rtc.localVideoTrack.play('local-player');
@@ -204,6 +208,8 @@ function room() {
             }
             // 离开频道
             await this.rtc.client.leave();
+            // 移除用于视频播放的盒子
+            document.querySelector(`#remote-playerList`)?.removeChild((document.querySelector('.remote-player') as Element));
             this.isShowJoin = true;
             this.isShowCheckDevices = true;
             this.isPlaying = false;
