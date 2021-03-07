@@ -238,14 +238,21 @@ function room() {
             }
         },
         async localAudioSwitch() {
-            if (this.isMicrophoneUsing) {
-                this.rtc.localAudioTrack.close();
-                await this.rtc.client.unpublish(this.rtc.localAudioTrack);
-                this.isMicrophoneUsing = false;
-            } else {
-                this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                this.rtc.client.publish(this.rtc.localAudioTrack);
-                this.isMicrophoneUsing = true;
+            try {
+                if (this.isMicrophoneUsing) {
+                    this.rtc.localAudioTrack.close();
+                    await this.rtc.client.unpublish(this.rtc.localAudioTrack);
+                    this.isMicrophoneUsing = false;
+                } else {
+                    this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                    this.rtc.client.publish(this.rtc.localAudioTrack);
+                    this.isMicrophoneUsing = true;
+                }
+            } catch (err) {
+                const { msgTitle, msgContent } = setMsg('rtcMsg', { err });
+                this.modalMsgTitle = msgTitle;
+                this.modalMsgContent = msgContent;
+                this.isShowModal = true;
             }
         },
         ok() {
