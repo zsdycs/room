@@ -1,14 +1,13 @@
 {
   "name": "room",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "基于 Agora.io 提供音视频服务的 web 应用",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve --mode=development --config ./webpack.config.js",
     "build": "webpack --mode=production --config ./webpack.config.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "ZSDYCS",
+  "license": "MIT",
   "devDependencies": {
     "cross-env": "^7.0.3",
     "css-loader": "^5.0.2",
