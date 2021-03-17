@@ -1,6 +1,6 @@
 import "./style.scss";
 import 'alpinejs';
-import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack, ICameraVideoTrack } from "agora-rtc-sdk-ng";
+import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack, ICameraVideoTrack, CameraVideoTrackInitConfig } from "agora-rtc-sdk-ng";
 import { settings } from './app-settings';
 import CryptoJS from 'crypto-js';
 
@@ -32,6 +32,18 @@ function room() {
         channel: 'room', // 频道名
         password: '',
     };
+
+    const config = {
+        cameraVideo: {
+            encoderConfig: '720p_2',
+            facingMode: 'user', // environment 前置摄像头
+        },
+        microphoneAudio: {
+            AEC: true, // 回声消除
+            ANS: true, // 噪声抑制
+            AGC: true, // 自动增益
+        }
+    }
 
     const rtc: RTC = {
         // 本地客户端
@@ -128,7 +140,7 @@ function room() {
             }
         });
     }
-    // 订阅远端处理
+    // 取消订阅远端处理
     function userUnPublished() {
         rtc.client.on('user-unpublished', async (user) => {
             document.querySelector(`#userID_${user.uid}`)?.remove();
@@ -164,8 +176,8 @@ function room() {
                     // 加入目标频道
                     this.rtc.client.join(settings.appId, this.clientOptions.channel, null, null)
                         .then(async (uid) => {
-                            this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                            this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+                            this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack(config.microphoneAudio);
+                            this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack((config.cameraVideo as CameraVideoTrackInitConfig));
                             // 将音视频轨道对象发布到频道中
                             this.rtc.client.publish(this.rtc.localAudioTrack);
                             this.isMicrophoneUsing = true;
@@ -258,11 +270,21 @@ function room() {
         },
         fullScreen() {
             if (!this.fullscreen) {
-                document.querySelector(`.video-group`)?.requestFullscreen();
-                this.fullscreen = true;
+                if (document.querySelector('.video-group')?.requestFullscreen) {
+                    document.querySelector('.video-group')?.requestFullscreen();
+                    document.querySelector('.video-group')?.classList.add('fullscreen');
+                    this.fullscreen = true;
+                    return;
+                }
+                // TODO css class
             } else {
-                document.exitFullscreen();
-                this.fullscreen = false;
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    document.querySelector('.video-group')?.classList.remove('fullscreen');
+                    this.fullscreen = false;
+                    return;
+                }
+                // TODO css class
             }
         },
         ok() {
@@ -328,6 +350,11 @@ function room() {
             this.modalMsgContent = msgContent;
             this.isShowModal = true;
             document.body.removeChild(textArea);
+        },
+        blowUp($event: any) {
+            // #remote-playerList
+            // #local-player
+            console.log($event.target);
         }
     }
 }
