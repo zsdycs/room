@@ -4,7 +4,7 @@
   "description": "基于 Agora.io 提供音视频服务的 web 应用",
   "scripts": {
     "start": "parcel src/index.html --port 80 --no-source-maps",
-    "build": "parcel build src/index.html"
+    "build": "parcel build src/index.html --experimental-scope-hoisting"
   },
   "author": "ZSDYCS",
   "license": "MIT",
