@@ -1,6 +1,6 @@
-import "./style.scss";
+import './style.scss';
 import 'alpinejs';
-import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack, ICameraVideoTrack, CameraVideoTrackInitConfig } from "agora-rtc-sdk-ng";
+import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack, ICameraVideoTrack, CameraVideoTrackInitConfig } from 'agora-rtc-sdk-ng';
 import { settings } from './app-settings';
 import CryptoJS from 'crypto-js';
 
@@ -47,7 +47,7 @@ function room() {
 
     const rtc: RTC = {
         // 本地客户端
-        client: AgoraRTC.createClient({ mode: "rtc", codec: "vp8" }),
+        client: AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' }),
         // @ts-ignore
         localAudioTrack: null,
         // @ts-ignore
@@ -122,7 +122,7 @@ function room() {
     }
     // 订阅远端处理
     function userPublished() {
-        rtc.client.on('user-published', async (user, mediaType) => {
+        rtc.client.on('user-published', async (user: any, mediaType: any) => {
             await rtc.client.subscribe(user, mediaType);
             // 视频
             if (mediaType === 'video') {
@@ -142,7 +142,7 @@ function room() {
     }
     // 取消订阅远端处理
     function userUnPublished() {
-        rtc.client.on('user-unpublished', async (user) => {
+        rtc.client.on('user-unpublished', async (user: any) => {
             document.querySelector(`#userID_${user.uid}`)?.remove();
         });
     }
@@ -175,7 +175,7 @@ function room() {
                     this.isDisabledPassword = true;
                     // 加入目标频道
                     this.rtc.client.join(settings.appId, this.clientOptions.channel, null, null)
-                        .then(async (uid) => {
+                        .then(async (uid: any) => {
                             this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack(config.microphoneAudio);
                             this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack((config.cameraVideo as CameraVideoTrackInitConfig));
                             // 将音视频轨道对象发布到频道中
@@ -188,7 +188,7 @@ function room() {
                             this.isShowJoin = false;
                             this.isPlaying = true;
                         })
-                        .catch((err) => {
+                        .catch((err: any) => {
                             const { msgTitle, msgContent } = setMsg('rtcMsg', { err });
                             this.modalMsgTitle = msgTitle;
                             this.modalMsgContent = msgContent;
@@ -302,10 +302,10 @@ function room() {
             AgoraRTC.getDevices()
                 .then((device: MediaDeviceInfo[]) => {
                     const audioDevices = device.filter((item) => {
-                        return item.kind === "audioinput";
+                        return item.kind === 'audioinput';
                     });
                     const videoDevices = device.filter((item) => {
-                        return item.kind === "videoinput";
+                        return item.kind === 'videoinput';
                     });
                     const devices = {
                         hasAudioDevice: audioDevices.length > 0 ? true : false,
@@ -332,12 +332,12 @@ function room() {
                         this.isShowModal = true;
                     }
                 })
-                .catch((err) => {
+                .catch((err: any) => {
                     const { msgTitle, msgContent } = setMsg('rtcMsg', { err });
                     this.modalMsgTitle = msgTitle;
                     this.modalMsgContent = msgContent;
                     this.isShowModal = true;
-                });;
+                });
         },
         copyLink() {
             const textArea = document.createElement('textarea');

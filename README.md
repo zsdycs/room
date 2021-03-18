@@ -25,13 +25,7 @@ ROOM——房间，这是一个基于 [Agora.io](https://www.agora.io/cn) 提供
 
 1. node 环境 [安装 node](https://nodejs.org/en/download/)
 2. 命令行，执行 `npm i`
-3. 命令行，执行 `npm run serve`
-4. 浏览器，打开 `http://localhost:8080`
-
-> 直接 `npm i` 安装可能会出现 node-sass 安装错误，请使用以下步骤安装 node-sass:
->
-> 1. `npm cache clean -force`
-> 2. `npm install -g mirror-config-china`
-> 3. `npm install node-sass`
+3. 命令行，执行 `npm run start`
+4. 浏览器，打开 `http://localhost`
 
 获取 [SHA256 加密字符串](https://tool.oschina.net/encrypt?type=2)
