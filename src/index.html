@@ -40,12 +40,12 @@
       </form>
 
       <!-- 视频通话页面 -->
-      <div class="video-group" x-show="isPlaying" @click="buttonDisplay()">
+      <div class="video-group" x-show="isPlaying" @click="buttonDisplay(event)">
         <!-- 顶部 -->
         <div class="video-btn-top">
           <div class="btn-group">
             <!-- 复制链接以分享房间 -->
-            <button type="button" class="btn-item" @click="copyLink()" title="复制链接以分享房间">
+            <button type="button" class="btn-item" @click="copyLink(event)" title="复制链接以分享房间">
               <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
                 <path id="fa-share"
                   d="M1792 640q0 26-19 45l-512 512q-19 19-45 19t-45-19-19-45v-256h-224q-98 0-175.5 6t-154 21.5-133 42.5-105.5 69.5-80 101-48.5 138.5-17.5 181q0 55 5 123 0 6 2.5 23.5t2.5 26.5q0 15-8.5 25t-23.5 10q-16 0-28-17-7-9-13-22t-13.5-30-10.5-24q-127-285-127-451 0-199 53-333 162-403 875-403h224v-256q0-26 19-45t45-19 45 19l512 512q19 19 19 45z" />
@@ -58,7 +58,7 @@
           <!-- 底部-居中按钮 -->
           <div class="btn-group-center">
             <!-- 摄像头打开、关闭 -->
-            <button x-show="rtc.localVideoTrack" type="button" class="btn-item" @click="localVideoSwitch()"
+            <button x-show="rtc.localVideoTrack" type="button" class="btn-item" @click="localVideoSwitch(event)"
               x-bind:title="(rtc.localVideoTrack && rtc.localVideoTrack.isPlaying) ? '摄像头关' : '摄像头开'">
               <span x-show="rtc.localVideoTrack && rtc.localVideoTrack.isPlaying">
                 <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
@@ -76,7 +76,7 @@
               </span>
             </button>
             <!-- 麦克风打开、关闭 -->
-            <button x-show="rtc.localAudioTrack" type="button" class="btn-item" @click="localAudioSwitch()"
+            <button x-show="rtc.localAudioTrack" type="button" class="btn-item" @click="localAudioSwitch(event)"
               x-bind:title="isMicrophoneUsing ? '麦克风关' : '麦克风开'">
               <svg x-show="isMicrophoneUsing" class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
                 xmlns="http://www.w3.org/2000/svg">
@@ -90,7 +90,7 @@
               </svg>
             </button>
             <!-- 离开 -->
-            <button type="button" class="btn-item" @click="leave()" title="离开">
+            <button type="button" class="btn-item" @click="leave(event)" title="离开">
               <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
                 <path id="fa-sign-out"
                   d="M704 1440q0 4 1 20t.5 26.5-3 23.5-10 19.5-20.5 6.5h-320q-119 0-203.5-84.5t-84.5-203.5v-704q0-119 84.5-203.5t203.5-84.5h320q13 0 22.5 9.5t9.5 22.5q0 4 1 20t.5 26.5-3 23.5-10 19.5-20.5 6.5h-320q-66 0-113 47t-47 113v704q0 66 47 113t113 47h312l11.5 1 11.5 3 8 5.5 7 9 2 13.5zm928-544q0 26-19 45l-544 544q-19 19-45 19t-45-19-19-45v-288h-448q-26 0-45-19t-19-45v-384q0-26 19-45t45-19h448v-288q0-26 19-45t45-19 45 19l544 544q19 19 19 45z" />
@@ -99,7 +99,7 @@
           </div>
           <!-- 底部-左侧按钮 -->
           <div class="btn-group-left">
-            <button type="button" class="btn-item" @click="switchCamera()" x-show="localDevices.camerasNum > 1 ? true : false" title="切换摄像头">
+            <button type="button" class="btn-item" @click="switchCamera(event)" x-show="localDevices.camerasNum > 1 ? true : false" title="切换摄像头">
               <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
                 <path id="fa-refresh"
                   d="M1639 1056q0 5-1 7-64 268-268 434.5t-478 166.5q-146 0-282.5-55t-243.5-157l-129 129q-19 19-45 19t-45-19-19-45v-448q0-26 19-45t45-19h448q26 0 45 19t19 45-19 45l-137 137q71 66 161 102t187 36q134 0 250-65t186-179q11-17 53-117 8-23 30-23h192q13 0 22.5 9.5t9.5 22.5zm25-800v448q0 26-19 45t-45 19h-448q-26 0-45-19t-19-45 19-45l138-138q-148-137-349-137-134 0-250 65t-186 179q-11 17-53 117-8 23-30 23h-199q-13 0-22.5-9.5t-9.5-22.5v-7q65-268 270-434.5t480-166.5q146 0 284 55.5t245 156.5l130-129q19-19 45-19t45 19 19 45z" />
@@ -109,7 +109,7 @@
           <!-- 底部-右侧按钮 -->
           <div class="btn-group-right">
             <!-- 全屏、退出全屏 -->
-            <button type="button" class="btn-item" @click="fullScreen()" x-bind:title="fullscreen ? '退出全屏' : '全屏'">
+            <button type="button" class="btn-item" @click="fullScreen(event)" x-bind:title="fullscreen ? '退出全屏' : '全屏'">
               <svg x-show="!fullscreen" class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
                 xmlns="http://www.w3.org/2000/svg">
                 <path id="fa-arrows-alt"
@@ -128,7 +128,7 @@
           <!-- 本地画面 -->
           <div class="local-video">
             <div id="topPlayer" class="topPlayer">
-              <div id="local-player" x-html="localPlayerContent"></div>
+              <div id="local-player"><div class="player-name">本地源</div></div>
             </div>
           </div>
           <!-- 远程画面 -->

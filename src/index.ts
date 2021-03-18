@@ -66,11 +66,13 @@ function room() {
     function setBlowUpListener() {
         const elementList = document.querySelectorAll('.remote-player');
         Array.from(elementList, (element: Element) => {
-            element.addEventListener('click', ($event: any) => {
+            element.addEventListener('click', (event: any) => {
+                console.log('setBlowUpListener')
+                event.stopPropagation();
                 const topPlayer = document.querySelector('#topPlayer') as Element;
                 const topPlayerInnerHTML = topPlayer.innerHTML;
-                const targetInnerHTML = $event.currentTarget.innerHTML;
-                $event.currentTarget.innerHTML = topPlayerInnerHTML;
+                const targetInnerHTML = event.currentTarget.innerHTML;
+                event.currentTarget.innerHTML = topPlayerInnerHTML;
                 topPlayer.innerHTML = targetInnerHTML;
             });
         })
@@ -153,6 +155,7 @@ function room() {
                 const remoteAudioTrack = user.audioTrack;
                 remoteAudioTrack?.play();
             }
+            setBlowUpListener();
         });
     }
     // 取消订阅远端处理
@@ -167,7 +170,7 @@ function room() {
         clientOptions, // client 参数
         rtc,
         isShowJoin: true, // Join 按钮
-        isPlaying: true, // 是否在视频通话
+        isPlaying: false, // 是否在视频通话
         isLocalPlaying: false, // 是否打开了摄像头
         isMicrophoneUsing: false, // 是否打开了麦克风
         fullscreen: false, // 是否全屏
@@ -177,13 +180,11 @@ function room() {
         modalMsgContent: '', // 消息内容
         isShowCheckDevices: true, // Check Devices 按钮
         localDevices, // 本地设备,
-        localPlayerContent: '<div class="player-name">本地源</div>', // 本地视频盒子的内容
         buttonShow: false, // 视频时的按钮显示状态
         // 初始化
         initRoom() {
             this.clientOptions.password = sessionStorage.getItem('ROOM/PWD');
             this.isDisabledPassword = sessionStorage.getItem('ROOM/PWD') ? true : false;
-            setBlowUpListener();
             userPublished();
             userUnPublished();
         },
@@ -204,8 +205,7 @@ function room() {
                             this.rtc.client.publish(this.rtc.localAudioTrack);
                             this.isMicrophoneUsing = true;
                             this.rtc.client.publish(this.rtc.localVideoTrack);
-                            this.rtc.localVideoTrack.play('topPlayer');
-                            this.buttonDisplay();
+                            this.rtc.localVideoTrack.play('local-player');
                             this.isLocalPlaying = true;
                             this.isShowCheckDevices = false;
                             this.isShowJoin = false;
@@ -236,7 +236,8 @@ function room() {
             }
         },
         // 离开
-        async leave() {
+        async leave(event: any) {
+            event.stopPropagation();
             // 销毁本地音视频轨道
             if (this.rtc.localAudioTrack) {
                 this.rtc.localAudioTrack.close();
@@ -256,14 +257,15 @@ function room() {
             this.isPlaying = false;
         },
         // 摄像头状态切换
-        async localVideoSwitch() {
+        async localVideoSwitch(event: any) {
+            event.stopPropagation();
             try {
                 if (this.isLocalPlaying) {
                     this.rtc.localVideoTrack.close();
                     await this.rtc.client.unpublish(this.rtc.localVideoTrack);
                     this.isLocalPlaying = false;
                 } else {
-                    this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+                    this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack((config.cameraVideo as CameraVideoTrackInitConfig));
                     this.rtc.client.publish(this.rtc.localVideoTrack);
                     this.rtc.localVideoTrack.play('local-player');
                     this.isLocalPlaying = true;
@@ -276,14 +278,15 @@ function room() {
             }
         },
         // 麦克风状态切换
-        async localAudioSwitch() {
+        async localAudioSwitch(event: any) {
+            event.stopPropagation();
             try {
                 if (this.isMicrophoneUsing) {
                     this.rtc.localAudioTrack.close();
                     await this.rtc.client.unpublish(this.rtc.localAudioTrack);
                     this.isMicrophoneUsing = false;
                 } else {
-                    this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                    this.rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack(config.microphoneAudio);
                     this.rtc.client.publish(this.rtc.localAudioTrack);
                     this.isMicrophoneUsing = true;
                 }
@@ -295,7 +298,8 @@ function room() {
             }
         },
         // 全屏
-        fullScreen() {
+        fullScreen(event: any) {
+            event.stopPropagation();
             if (!this.fullscreen) {
                 if (document.querySelector('.video-group')?.requestFullscreen) {
                     document.querySelector('.video-group')?.requestFullscreen();
@@ -368,7 +372,8 @@ function room() {
                 });
         },
         // 复制链接
-        copyLink() {
+        copyLink(event: any) {
+            event.stopPropagation();
             const textArea = document.createElement('textarea');
             textArea.value = `${location.href}`;
             document.body.appendChild(textArea);
@@ -381,7 +386,8 @@ function room() {
             document.body.removeChild(textArea);
         },
         // 切换摄像头
-        async switchCamera() {
+        async switchCamera(event: any) {
+            event.stopPropagation();
             switch (config.cameraVideo.facingMode) {
                 case 'user':
                     config.cameraVideo.facingMode = 'environment';
@@ -393,12 +399,13 @@ function room() {
                     break;
             }
             this.rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack((config.cameraVideo as CameraVideoTrackInitConfig));
-            this.localPlayerContent = '<div class="player-name">本地源</div>';
+            const localPlayer = document.querySelector('#local-player') as HTMLElement;
+            localPlayer.innerHTML = '<div class="player-name">本地源</div>';
             this.rtc.localVideoTrack.play('local-player');
             this.rtc.client.publish(this.rtc.localVideoTrack);
         },
         // 视频时按钮显示隐藏
-        buttonDisplay() {
+        buttonDisplay(event: any) {
             const top = document.querySelector('.video-btn-top') as HTMLElement;
             const bottom = document.querySelector('.video-btn-bottom') as HTMLElement;
             [top, bottom].forEach((item: HTMLElement) => {
