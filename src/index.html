@@ -19,7 +19,8 @@
       </div>
 
       <!-- 表单 -->
-      <div class="form" x-show="!isPlaying">
+      <form class="form" x-show="!isPlaying">
+        <input type="text" autocomplete="username" style="display: none;">
         <p class="required">密码</p>
         <div class="input-row">
           <input type="password" autocomplete="current-password" placeholder="输入密码" x-model="clientOptions.password"
@@ -36,10 +37,10 @@
           <button type="button" class="btn" @click="checkDevices()" x-show="isShowCheckDevices"
             title="检测设备">检测设备</button>
         </div>
-      </div>
+      </form>
 
       <!-- 视频通话页面 -->
-      <div class="video-group" x-show="isPlaying">
+      <div class="video-group" x-show="isPlaying" @click="buttonDisplay()">
         <!-- 顶部 -->
         <div class="video-btn-top">
           <div class="btn-group">
@@ -60,15 +61,15 @@
             <button x-show="rtc.localVideoTrack" type="button" class="btn-item" @click="localVideoSwitch()"
               x-bind:title="(rtc.localVideoTrack && rtc.localVideoTrack.isPlaying) ? '摄像头关' : '摄像头开'">
               <span x-show="rtc.localVideoTrack && rtc.localVideoTrack.isPlaying">
-                <svg class="fa-svg" width="1792"
-                  height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
+                  xmlns="http://www.w3.org/2000/svg">
                   <path id="fa-eye"
                     d="M1664 960q-152-236-381-353 61 104 61 225 0 185-131.5 316.5t-316.5 131.5-316.5-131.5-131.5-316.5q0-121 61-225-229 117-381 353 133 205 333.5 326.5t434.5 121.5 434.5-121.5 333.5-326.5zm-720-384q0-20-14-34t-34-14q-125 0-214.5 89.5t-89.5 214.5q0 20 14 34t34 14 34-14 14-34q0-86 61-147t147-61q20 0 34-14t14-34zm848 384q0 34-20 69-140 230-376.5 368.5t-499.5 138.5-499.5-139-376.5-368q-20-35-20-69t20-69q140-229 376.5-368t499.5-139 499.5 139 376.5 368q20 35 20 69z" />
                 </svg>
               </span>
               <span x-show="rtc.localVideoTrack && !rtc.localVideoTrack.isPlaying">
-                <svg class="fa-svg" width="1792"
-                  height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792"
+                  xmlns="http://www.w3.org/2000/svg">
                   <path id="fa-eye-slash"
                     d="M555 1335l78-141q-87-63-136-159t-49-203q0-121 61-225-229 117-381 353 167 258 427 375zm389-759q0-20-14-34t-34-14q-125 0-214.5 89.5t-89.5 214.5q0 20 14 34t34 14 34-14 14-34q0-86 61-147t147-61q20 0 34-14t14-34zm363-191q0 7-1 9-106 189-316 567t-315 566l-49 89q-10 16-28 16-12 0-134-70-16-10-16-28 0-12 44-87-143-65-263.5-173t-208.5-245q-20-31-20-69t20-69q153-235 380-371t496-136q89 0 180 17l54-97q10-16 28-16 5 0 18 6t31 15.5 33 18.5 31.5 18.5 19.5 11.5q16 10 16 27zm37 447q0 139-79 253.5t-209 164.5l280-502q8 45 8 84zm448 128q0 35-20 69-39 64-109 145-150 172-347.5 267t-419.5 95l74-132q212-18 392.5-137t301.5-307q-115-179-282-294l63-112q95 64 182.5 153t144.5 184q20 34 20 69z" />
                 </svg>
@@ -96,6 +97,15 @@
               </svg>
             </button>
           </div>
+          <!-- 底部-左侧按钮 -->
+          <div class="btn-group-left">
+            <button type="button" class="btn-item" @click="switchCamera()" x-show="localDevices.camerasNum > 1 ? true : false" title="切换摄像头">
+              <svg class="fa-svg" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                <path id="fa-refresh"
+                  d="M1639 1056q0 5-1 7-64 268-268 434.5t-478 166.5q-146 0-282.5-55t-243.5-157l-129 129q-19 19-45 19t-45-19-19-45v-448q0-26 19-45t45-19h448q26 0 45 19t19 45-19 45l-137 137q71 66 161 102t187 36q134 0 250-65t186-179q11-17 53-117 8-23 30-23h192q13 0 22.5 9.5t9.5 22.5zm25-800v448q0 26-19 45t-45 19h-448q-26 0-45-19t-19-45 19-45l138-138q-148-137-349-137-134 0-250 65t-186 179q-11 17-53 117-8 23-30 23h-199q-13 0-22.5-9.5t-9.5-22.5v-7q65-268 270-434.5t480-166.5q146 0 284 55.5t245 156.5l130-129q19-19 45-19t45 19 19 45z" />
+              </svg>
+            </button>
+          </div>
           <!-- 底部-右侧按钮 -->
           <div class="btn-group-right">
             <!-- 全屏、退出全屏 -->
@@ -117,16 +127,15 @@
         <div class="video-container">
           <!-- 本地画面 -->
           <div class="local-video">
-            <div id="local-player" class="topPlayer">
-              <div class="local-player-name">本地源</div>
+            <div id="topPlayer" class="topPlayer">
+              <div id="local-player" x-html="localPlayerContent"></div>
             </div>
           </div>
           <!-- 远程画面 -->
           <div class="remote-video">
-            <div id="remote-playerList" @click="blowUp($event)">
-              <!-- <div class="remote-player lowPlayer">远程源1</div>
-              <div class="remote-player lowPlayer">远程源2</div>
-              <div class="remote-player lowPlayer">远程源3</div> -->
+            <div id="remote-playerList">
+              <!-- <div class="remote-player lowPlayer"></div>
+              <div class="remote-player lowPlayer"></div> -->
             </div>
           </div>
         </div>
