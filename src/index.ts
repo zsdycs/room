@@ -63,19 +63,99 @@ function room() {
 
     // ************************************************** handle **************************************************
     // 放大视频
-    function setBlowUpListener() {
-        const elementList = document.querySelectorAll('.remote-player');
-        Array.from(elementList, (element: Element) => {
-            element.addEventListener('click', (event: any) => {
-                console.log('setBlowUpListener')
-                event.stopPropagation();
-                const topPlayer = document.querySelector('#topPlayer') as Element;
-                const topPlayerInnerHTML = topPlayer.innerHTML;
-                const targetInnerHTML = event.currentTarget.innerHTML;
-                event.currentTarget.innerHTML = topPlayerInnerHTML;
-                topPlayer.innerHTML = targetInnerHTML;
-            });
-        })
+    function blowUp(event: any) {
+        const playerListChildren = document.querySelector('#playerList')?.children as HTMLCollection;
+        Array.from(playerListChildren, (player: Element) => {
+            if (player.className.indexOf('topPlayer') !== -1) {
+                player.classList.remove('topPlayer');
+                player.classList.add('lowPlayer');
+                setLowPlayerListener().one(player);
+                (player as HTMLElement).style.left = event.target.style.left;
+                (player as HTMLElement).style.top = event.target.style.top;
+            }
+        });
+        event.target.classList.remove('lowPlayer');
+        event.target.classList.add('topPlayer');
+        event.target.style.left = '0px';
+        event.target.style.top = '0px';
+    }
+    // 移动小视频窗口
+    function setLowPlayerListener() {
+        let moveElement: any = null;
+        let diffX = 0;
+        let diffY = 0;
+        const mouseMove = { X: 0, Y: 0 };
+        function validateElement(event: any) {
+            const target = event.target;
+            if (target.className.indexOf('lowPlayer') !== -1) {
+                return target;
+            } else {
+                return null;
+            }
+        }
+        function mouseHandler(event: any) {
+            if (event.type === 'mousedown' || event.type === 'touchstart') {
+                moveElement = validateElement(event);
+                if (moveElement != null) {
+                    mouseMove.X = event.clientX || event.changedTouches[0].clientX;
+                    mouseMove.Y = event.clientY || event.changedTouches[0].clientY;
+                    if (event.type === 'touchstart') {
+                        diffX = event.changedTouches[0].clientX - moveElement.offsetLeft + 10;
+                        diffY = event.changedTouches[0].clientY - moveElement.offsetTop + 10;
+                    } else {
+                        diffX = event.clientX - moveElement.offsetLeft + 10;
+                        diffY = event.clientY - moveElement.offsetTop + 10;
+                    }
+                }
+            }
+            if (event.type === 'mousemove' || event.type === 'touchmove') {
+                if (moveElement) {
+                    if (event.type === 'touchmove') {
+                        moveElement.style.left = (event.changedTouches[0].clientX - diffX) + 'px';
+                        moveElement.style.top = (event.changedTouches[0].clientY - diffY) + 'px';
+                    } else {
+                        moveElement.style.left = (event.clientX - diffX) + 'px';
+                        moveElement.style.top = (event.clientY - diffY) + 'px';
+                    }
+                }
+            }
+            if (event.type === 'mouseup' || event.type === 'touchend') {
+                const timer = setTimeout((move: { X: number, Y: number }) => {
+                    if (Math.abs(move.X - (event.clientX || event.changedTouches[0].clientX)) < 1 ||
+                        Math.abs(move.Y - (event.clientY || event.changedTouches[0].clientY)) < 1) {
+                        blowUp(event);
+                    }
+                    clearTimeout(timer);
+                }, 100, mouseMove);
+                moveElement = null;
+                diffX = 0;
+                diffY = 0;
+            }
+        };
+        return {
+            mouseHandler,
+            all() {
+                const playerList = document.querySelectorAll('.lowPlayer');
+                Array.from(playerList, (player: Element) => {
+                    player.addEventListener('click', (event: any) => { event.stopPropagation(); });
+                    player.addEventListener('touchstart', mouseHandler, { passive: true });
+                    player.addEventListener('touchmove', mouseHandler, { passive: true });
+                    player.addEventListener('touchend', mouseHandler, { passive: true });
+                    player.addEventListener('mousedown', mouseHandler, { passive: true });
+                    player.addEventListener('mousemove', mouseHandler, { passive: true });
+                    player.addEventListener('mouseup', mouseHandler, { passive: true });
+                });
+            },
+            one(player: Element) {
+                player.addEventListener('click', (event: any) => { event.stopPropagation(); });
+                player.addEventListener('touchstart', mouseHandler, { passive: true });
+                player.addEventListener('touchmove', mouseHandler, { passive: true });
+                player.addEventListener('touchend', mouseHandler, { passive: true });
+                player.addEventListener('mousedown', mouseHandler, { passive: true });
+                player.addEventListener('mousemove', mouseHandler, { passive: true });
+                player.addEventListener('mouseup', mouseHandler, { passive: true });
+            },
+        }
     }
     // SHA256 加密
     function cryptographicEncryption(password: string | null) {
@@ -155,7 +235,8 @@ function room() {
                 const remoteAudioTrack = user.audioTrack;
                 remoteAudioTrack?.play();
             }
-            setBlowUpListener();
+            // setBlowUpListener();
+            setLowPlayerListener().all();
         });
     }
     // 取消订阅远端处理
@@ -187,6 +268,8 @@ function room() {
             this.isDisabledPassword = sessionStorage.getItem('ROOM/PWD') ? true : false;
             userPublished();
             userUnPublished();
+            // setBlowUpListener();
+            setLowPlayerListener().all();
         },
         // 加入
         async join() {
