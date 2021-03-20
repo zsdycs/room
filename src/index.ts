@@ -70,14 +70,14 @@ function room() {
                 player.classList.remove('topPlayer');
                 player.classList.add('lowPlayer');
                 setLowPlayerListener().one(player);
-                (player as HTMLElement).style.left = event.target.style.left;
-                (player as HTMLElement).style.top = event.target.style.top;
+                (player as HTMLElement).style.left = event.target.parentElement.parentElement.style.left;
+                (player as HTMLElement).style.top = event.target.parentElement.parentElement.style.top;
             }
         });
-        event.target.classList.remove('lowPlayer');
-        event.target.classList.add('topPlayer');
-        event.target.style.left = '0px';
-        event.target.style.top = '0px';
+        event.target.parentElement.parentElement.classList.remove('lowPlayer');
+        event.target.parentElement.parentElement.classList.add('topPlayer');
+        event.target.parentElement.parentElement.style.left = '0px';
+        event.target.parentElement.parentElement.style.top = '0px';
     }
     // 移动小视频窗口
     function setLowPlayerListener() {
@@ -87,7 +87,7 @@ function room() {
         const mouseMove = { X: 0, Y: 0 };
         function validateElement(event: any) {
             const target = event.target;
-            if (target.className.indexOf('lowPlayer') !== -1) {
+            if (target.className.indexOf('agora_video_player') !== -1) {
                 return target;
             } else {
                 return null;
@@ -95,7 +95,7 @@ function room() {
         }
         function mouseHandler(event: any) {
             if (event.type === 'mousedown' || event.type === 'touchstart') {
-                moveElement = validateElement(event);
+                moveElement = validateElement(event).parentElement.parentElement;
                 if (moveElement != null) {
                     mouseMove.X = event.clientX || event.changedTouches[0].clientX;
                     mouseMove.Y = event.clientY || event.changedTouches[0].clientY;
@@ -224,8 +224,8 @@ function room() {
             // 视频
             if (mediaType === 'video') {
                 const remoteVideoTrack = user.videoTrack;
-                const playerContainer = `<div class="remote-player lowPlayer"><div id="userID_${user.uid.toString()}"></div></div>`;
-                document.querySelector('#remote-playerList')?.insertAdjacentHTML('beforeend', playerContainer);
+                const playerContainer = `<div class="remote-player lowPlayer" id="userID_${user.uid.toString()}"></div>`;
+                document.querySelector('#playerList')?.insertAdjacentHTML('beforeend', playerContainer);
                 remoteVideoTrack?.play(`userID_${user.uid.toString()}`);
             }
 
@@ -242,7 +242,7 @@ function room() {
     // 取消订阅远端处理
     function userUnPublished() {
         rtc.client.on('user-unpublished', async (user: any) => {
-            document.querySelector(`#userID_${user.uid}`)?.parentElement?.remove();
+            document.querySelector(`#userID_${user.uid}`)?.remove();
         });
     }
     // ************************************************** return **************************************************
