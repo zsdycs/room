@@ -224,9 +224,17 @@ function room() {
             // 视频
             if (mediaType === 'video') {
                 const remoteVideoTrack = user.videoTrack;
-                const playerContainer = `<div class="remote-player lowPlayer" id="userID_${user.uid.toString()}"></div>`;
+                const remotePlayer = document.querySelectorAll('.remote-player');
+                const remotePlayerNum = remotePlayer.length;
+                const playerContainer = `<div class="remote-player ${remotePlayerNum === 0 ? 'topPlayer' : 'lowPlayer'}" id="userID_${user.uid.toString()}"></div>`;
                 document.querySelector('#playerList')?.insertAdjacentHTML('beforeend', playerContainer);
                 remoteVideoTrack?.play(`userID_${user.uid.toString()}`);
+                const localPlayer = document.querySelector('#local-player') as HTMLElement;
+                if (localPlayer?.className.indexOf('topPlayer') !== -1) {
+                    localPlayer.classList.remove('topPlayer');
+                    localPlayer.classList.add('lowPlayer');
+                    // 位置 TODO
+                }
             }
 
             // 音频
@@ -235,7 +243,6 @@ function room() {
                 const remoteAudioTrack = user.audioTrack;
                 remoteAudioTrack?.play();
             }
-            // setBlowUpListener();
             setLowPlayerListener().all();
         });
     }
@@ -243,6 +250,16 @@ function room() {
     function userUnPublished() {
         rtc.client.on('user-unpublished', async (user: any) => {
             document.querySelector(`#userID_${user.uid}`)?.remove();
+            const remotePlayerNum = document.querySelectorAll('.remote-player').length;
+            if (remotePlayerNum === 0) {
+                const localPlayer = document.querySelector('#local-player') as HTMLElement;
+                if (localPlayer?.className.indexOf('lowPlayer') !== -1) {
+                    localPlayer.classList.remove('lowPlayer');
+                    localPlayer.classList.add('topPlayer');
+                    localPlayer.style.left = '0px';
+                    localPlayer.style.top = '0px';
+                }
+            }
         });
     }
     // ************************************************** return **************************************************
