@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "基于 Agora.io 提供音视频服务的 web 应用",
   "scripts": {
-    "start": "parcel src/index.html --port 80 --no-source-maps",
+    "start": "parcel src/index.html --port 80",
     "build": "parcel build src/index.html"
   },
   "author": "ZSDYCS",
